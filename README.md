@@ -1,5 +1,9 @@
 # BalgoFuckerrrr
 
+Modified from the original code by 9andrea1 (https://github.com/9andrea1/ssh-botnet)
+
+## Usage
+
 Add ssh credentials into 'creds.txt' file and run './client.py'
 
 ## Example
