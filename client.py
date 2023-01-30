@@ -36,7 +36,7 @@ def check_hosts(silent=True):
                 running_hosts[host] = result[:result.find("#")]
             else: 
                 running_hosts[host] = "Host Down"
-    print("\n[+] Host List Updated\n") if not silent else None
+    print(colored("\n[+] Host List Updated\n", "green", attrs=["bold"])) if not silent else None
 
 @parallel
 def active_hosts(): 
@@ -53,10 +53,10 @@ def active_hosts():
                                colored(uptime, 'magenta', attrs=['bold'])])
                 flag = 1
     if flag == 1:
-        print("\n[!] Active Hosts:\n")
+        print(colored("\n[+] Active Hosts:\n", "green", attrs=['bold']))
         print(table)
     else:
-        print(colored("[X] No active hosts\n", "red", ['bold']))
+        print(colored("[X] No active hosts\n", "red", attrs=['bold']))
 
 
 def list_hosts():
@@ -75,7 +75,8 @@ def list_hosts():
 
 def get_hosts():
     selected_hosts = []
-    tmp = input("Hosts id (0 1 2... / all) [default is all]: ")
+    print(colored("[+] Hosts id (0 1 2... / all) [default is all]: ", "green", attrs=["bold"]), end="")
+    tmp = input()
     if tmp == "" or tmp == "all":
         selected_hosts = env.hosts
     else:
@@ -98,7 +99,8 @@ def run_command(command):
  
 
 def download(): 
-    remote_path = input("Remote path: ")
+    print(colored("[+] Remote path: ", "green", attrs=["bold"]), end="")
+    remote_path = input()
     readline.parse_and_bind("tab: complete")     
     local_path = input("Local path: ")
     readline.parse_and_bind('set disable-completion on') 
@@ -108,15 +110,15 @@ def download():
 
 def upload(): 
     readline.parse_and_bind("tab: complete")
-    print(colored("[!] Local path: ", "yellow", attrs=["bold"]), end="") 
+    print(colored("[+] Local path: ", "green", attrs=["bold"]), end="") 
     local_path = input()
     readline.parse_and_bind('set disable-completion on') 
-    print(colored("[!] Remote path: ", "yellow", attrs=["bold"]), end="")
+    print(colored("[+] Remote path: ", "green", attrs=["bold"]), end="")
     remote_path = input()
     remote_path_dir = remote_path[:remote_path.rfind("/")] 
     run('mkdir -p %s'%remote_path_dir)           
     put(local_path, remote_path)
-    print(colored("[+] Upload Completed\n","green", attrs=["bold"])) 
+    print(colored("[+] Upload Completed\n", "green", attrs=["bold"])) 
 
 
 @parallel
@@ -125,13 +127,14 @@ def background_run(command):
     run(command, pty=False)
 
 @parallel
-def script_exec(local_path):
+def scripts_exec(local_path):
     put(local_path, "/tmp/script.fabric", mode=0o755)
     background_run('/tmp/script.fabric')
 
 @parallel
 def mass_command():
-    cmd = input("Command: ")
+    print(colored("[+] Command to execute: ", "green", attrs=["bold"]), end="")
+    cmd = input()
     try:
         with settings(hide('warnings', 'running', 'stdout', 'stderr')):
             for host, result in execute(run_command, cmd, hosts=get_hosts()).items():
@@ -141,27 +144,29 @@ def mass_command():
         print("")           
         sys.exit()
     except:
-        print(colored("Invalid host id\n","red"))          
+        print(colored("[X] Invalid host id\n","red", attrs=["bold"]))          
 
 def interactive_shell():
-    host = int(input("Host id: "))
-    try:                    
+    print(colored("[+] Host id: ", "green", attrs=["bold"]), end="")
+    host = int(input())
+    try:
         execute(open_shell, host=env.hosts[host])
     except KeyboardInterrupt:
-        print("")           
-        sys.exit()          
+        print("")
+        sys.exit()
     except:
-        print(colored("Invalid host id\n","red"))        
+        print(colored("[X] Invalid host id\n","red", attrs=["bold"]))
 
 
 def script_exec():
     hosts_list = get_hosts()
     readline.parse_and_bind("tab: complete")
-    local_path = input("Local path: ")
+    print(colored("[+] Local path: ", "green", attrs=["bold"]), end="")
+    local_path = input()
     readline.parse_and_bind('set disable-completion on')
     with settings(hide('warnings', 'running', 'stdout', 'stderr')):
-        execute(script_exec, local_path, hosts=hosts_list)
-        print(colored("Execution Completed\n","green"))
+        execute(scripts_exec, local_path, hosts=hosts_list)
+        print(colored("[+] Execution Completed\n","green", attrs=["bold"]))
         
 def menu():
     for num, desc in enumerate(["List Hosts", "Active Hosts", "Update Hosts", "Run Command", "Open Shell", "File Upload", "File Download", "Script Exec", "Exit"]):
