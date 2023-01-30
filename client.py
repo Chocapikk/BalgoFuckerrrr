@@ -131,6 +131,8 @@ def scripts_exec(local_path):
     put(local_path, "/tmp/script.fabric", mode=0o755)
     background_run('/tmp/script.fabric')
 
+from termcolor import colored
+
 @parallel
 def mass_command():
     print(colored("[+] Command to execute: ", "green", attrs=["bold"]), end="")
@@ -138,8 +140,8 @@ def mass_command():
     try:
         with settings(hide('warnings', 'running', 'stdout', 'stderr')):
             for host, result in execute(run_command, cmd, hosts=get_hosts()).items():
-                print("\n[" + host + "]: " + cmd)
-                print(('-' * 80) + '\n' + result + '\n')
+                print("\n" + colored("[" + host + "]: " + cmd, "green", attrs=["bold"]))
+                print(colored(('-' * 80), "yellow", attrs=["bold"]) + '\n' + colored(result, "magenta", attrs=["bold"]) + '\n')
     except KeyboardInterrupt:
         print("")           
         sys.exit()
